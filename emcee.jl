@@ -42,8 +42,7 @@ function Sampler(n_walkers::Integer, dim::Integer, probfn::Function)
 	Sampler(n_walkers,dim,probfn,a,chain,ln_post,blobs,accpt,threads,())
 end
 
-type Ensemble
-	# Type for the ensemble
+function sample(Sampler)
 end
 
 function reset(Sampler)
