@@ -1,6 +1,6 @@
 # emcee Julia
 
-# Ensemble sampling MCMC based on the emcee package for Python
+# Ensemble sampling MCMC inspired by the emcee package for Python
 # http://danfm.ca/emcee/
 
 # ref.:
