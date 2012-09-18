@@ -7,16 +7,15 @@
 # Goodman & Weare, Ensemble Samplers With Affine Invariance
 #   Comm. App. Math. Comp. Sci., Vol. 5 (2010), No. 1, 65–80
 
-
+require("options.jl")
 import Base.*
-load("options.jl")
 import OptionsMod.*
 
 
 abstract Blob
 
 # Random generator for the Z distribution of Goodman&Weare, where
-# p(x) = 1/sqrt(x) when 1/a <= x <= a.
+# p(x) ~= 1/sqrt(x) when x is in [1/a, a].
 randZ(a::Float64) = ((a - 1.0) * rand() + 1.0)^2 / a
 
 # The Sampler type is the interface between the user and the machinery.
