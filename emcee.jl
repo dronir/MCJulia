@@ -9,7 +9,7 @@
 
 abstract Blob
 
-# Random generator for the Z distribution of Goodman&Weare, where
+# Random generator for the Z distribution of Goodman & Weare, where
 # p(x) = 1/sqrt(x) when 1/a <= x <= a.
 randZ(a::Float64) = ((a - 1.0) * rand() + 1.0)^2 / a
 
@@ -42,9 +42,58 @@ function Sampler(n_walkers::Integer, dim::Integer, probfn::Function)
 	Sampler(n_walkers,dim,probfn,a,chain,ln_post,blobs,accpt,threads,())
 end
 
-function sample(Sampler)
+# Return lnprobs and blobs at given position
+function get_lnprob(S::Sampler, p::Array{Float64,2})
+	return 0,0
 end
 
+
+function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storechain::Bool)
+	halfk = fld(S.n_walkers, 2)
+
+	p = p0
+	lnprob, blobs = get_lnprob(S, p)
+
+	# Add N/thin columns of zeroes to the Sampler's chain and ln_posterior
+	if storechain
+		S.chain = hcat(S.chain, zeros(Float64, (S.n_walkers, S.dim, fld(N,thin))))
+		S.ln_posterior = hcat(S.ln_posterior, zeros(Float64, (S.n_walkers, fld(N,thin))))
+	end
+
+	randZ() = randZ(S.a)
+
+	first = 1 : halfk
+	second = halfk+1 : S.n_walkers
+
+	# FIXME
+	#i0 = S.iteration
+	i0 = 0
+	for i = i0+1 : i0+N
+		for t in [(first, second), (second, first)]
+			active, passive = t
+			l_act = length(active)
+			l_pas = length(passive)
+			for k in active
+				X0 = p[k,:]
+				choice = passive[randi(l_pas)]
+				X1 = p[choice,:]
+				z = randZ()
+				Y = X1 + z * (X0 - X1)
+				new_lnprob = get_lnprob(S, Y)
+				q = (S.dim - 1) * log(z) + new_lnprob - lnprob
+				if q > log(rand())
+					lnprob = new_lnprob
+					p[k,:] = Y
+				end
+				if (i-i0) % thin == 0
+					S.ln_posterior[k, i/thin] = lnprob
+					S.chain[k, :, i/thin] = p[k,:]
+				end
+			end
+		end
+	end
+end
+
+# Reset a Sampler to state after construction.
 function reset(Sampler)
-	# This will reset a Sampler.
 end
