@@ -11,7 +11,7 @@ require("options.jl")
 
 module MCJulia
 
-export Blob, Sampler, sample, reset, log_rosenbrock
+export Blob, Sampler, sample, reset, log_rosenbrock, flat_chain, save_chain
 
 import Base.*
 import OptionsMod.*
@@ -146,12 +146,13 @@ function flat_chain(S::Sampler)
 			flatchain[dim, k:(k+walkers-1)] = S.chain[:,dim,step]
 		end
 	end
+	return flatchain
 end
 
 # Squash the chains and save them in a csv file
 function save_chain(S::Sampler, filename::String)
 	flatchain = flat_chain(S)
-	csvwrite(S, filename)
+	csvwrite(filename, flatchain)
 end
 
 
