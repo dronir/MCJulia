@@ -1,4 +1,4 @@
-# emcee Julia
+# MC Julia
 
 # Ensemble sampling MCMC inspired by the emcee package for Python
 # http://danfm.ca/emcee/
