@@ -19,6 +19,7 @@ import OptionsMod.*
 
 abstract Blob
 
+
 # Random generator for the Z distribution of Goodman & Weare, where
 # p(x) = 1/sqrt(x) when 1/a <= x <= a.
 randZ(a::Float64) = ((a - 1.0) * rand() + 1.0)^2 / a
@@ -128,4 +129,23 @@ function reset(S::Sampler)
 	return S
 end
 
+# Flatten the chain along the walker axis
+function flat_chain(S::Sampler)
+	walkers,dimensions,steps = size(S.chain)
+	flatchain = zeros((dimensions, walkers*steps))
+	for step = 1:steps
+		k = (step-1)*walkers + 1
+		for dim = 1:dimensions
+			flatchain[dim, k:(k+walkers-1)] = S.chain[:,dim,step]
+		end
+	end
 end
+
+# Squash the chains and save them in a csv file
+function save_chain(S::Sampler, filename::String)
+	flatchain = flat_chain(S)
+	csvwrite(S, filename)
+end
+
+
+end # module ends
