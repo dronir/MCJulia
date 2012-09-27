@@ -1,4 +1,4 @@
-load("emcee.jl")
+load("mcjulia.jl")
 import MCJulia.*
 
 f(X) = -(X[1]-1.0)^2
