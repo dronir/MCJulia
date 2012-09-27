@@ -103,21 +103,20 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 	for i = i0+1 : i0+N
 		for t in subsets
 			active, passive = t
-#			l_act = length(active)
 			l_pas = length(passive)
 			for k in active
-				X0 = p[k,:]
+				X_active = p[k,:]
 				choice = passive[randi(l_pas)]
-				X1 = p[choice,:]
+				X_passive = p[choice,:]
 				z = randZ(S.a)
-				Y = X1 + z * (X0 - X1)
-				new_lnprob = S.probfn(Y)
-				log_ratio = (S.dim - 1) * log(z) + new_lnprob - lnprob[k] # FIXME: lnprob
-				if log_ratio < log(rand())
+				proposal = X_passive + z * (X_active - X_passive)
+				new_lnprob = S.probfn(proposal)
+				log_ratio = (S.dim - 1) * log(z) + new_lnprob - lnprob[k]
+				if log(rand()) <= log_ratio
 					lnprob[k] = new_lnprob
-					p[k,:] = Y
+					p[k,:] = proposal
 				end
-				if (i-i0) % thin == 0
+				if (i-i0) % thin == 0 && storechain
 					S.ln_posterior[k, i/thin] = lnprob[k]
 					S.chain[k, :, fld(i,thin)] = vec(p[k,:])
 				end
