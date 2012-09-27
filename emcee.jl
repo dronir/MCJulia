@@ -70,12 +70,13 @@ function get_lnprob(S::Sampler, pos::Array{Float64,2})
 			lnprob[k] = p[1]
 			blobs[k] = p[2]
 		else
-			error("something weird came out of S.lnprobf()")
+			error("Something weird came out of S.lnprobf()")
 		end
 	end
 	# FIXME
 	return lnprob, None
 end
+
 
 
 function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storechain::Bool)
@@ -95,14 +96,14 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 
 	first = 1 : halfk
 	second = halfk+1 : k
-	subsets = [(first, second), (second, first)]
+	divisions = [(first, second), (second, first)]
 
 	# FIXME
 	#i0 = S.iteration
 #	i0 = 0
 	for i = i0+1 : i0+N
-		for t in subsets
-			active, passive = t
+		for ensembles in divisions
+			active, passive = ensembles
 			l_pas = length(passive)
 			for k in active
 				X_active = p[k,:]
@@ -116,14 +117,28 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 					lnprob[k] = new_lnprob
 					p[k,:] = proposal
 				end
-				if (i-i0) % thin == 0 && storechain
+				if storechain && (i-i0) % thin == 0
 					S.ln_posterior[k, i/thin] = lnprob[k]
 					S.chain[k, :, fld(i,thin)] = vec(p[k,:])
 				end
 			end
 		end
 	end
+	return p
 end
+
+function sample(S::Sampler, N::Int64, thin::Int64, storechain::Bool)
+	N = size(S.chain, 3)
+	if N == 0
+		error("No initial position for chain!")
+	end
+	p0 = S.chain[:,:,N]
+	sample(S, p0, N, thin, storechain)
+end
+
+sample(S::Sampler, N::Int64) = sample(S, N, 1, true)
+sample(S::Sampler, N::Int64, storechain::Bool) = sample(S, N, 1, storechain)
+
 
 # Reset a Sampler to state after construction.
 function reset(S::Sampler)
