@@ -11,13 +11,16 @@ require("options.jl")
 
 module MCJulia
 
-export Blob, Sampler, sample, reset
+export Blob, Sampler, sample, reset, log_rosenbrock
 
 import Base.*
 import OptionsMod.*
 
 
 abstract Blob
+
+# Test function (log Rosenbrock banana):
+log_rosenbrock(X::Array{Float64,1}) = log((1-X[1])^2 + 100*(X[2]-X[1]^2)^2)
 
 # Random generator for the Z distribution of Goodman & Weare, where
 # p(x) = 1/sqrt(x) when 1/a <= x <= a.
