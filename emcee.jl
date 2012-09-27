@@ -20,7 +20,7 @@ import OptionsMod.*
 abstract Blob
 
 # Test function (log Rosenbrock banana):
-log_rosenbrock(X::Array{Float64,1}) = log((1-X[1])^2 + 100*(X[2]-X[1]^2)^2)
+log_rosenbrock(X::Array{Float64}) = log((1-X[1])^2 + 100*(X[2]-X[1]^2)^2)
 
 # Random generator for the Z distribution of Goodman & Weare, where
 # p(x) = 1/sqrt(x) when 1/a <= x <= a.
@@ -40,7 +40,7 @@ type Sampler
 	args::(Any...)
 end
 
-function Sampler(k, dim, f, opts::Options)
+function Sampler(k::Integer, dim::Integer, f::Function, opts::Options)
 	@defaults opts a=2.0 threads=1 accpt=0.0
 	@defaults opts chain = zeros(Float64, (k, dim, 0))
 	@defaults opts ln_p = zeros(Float64, (k, 0))
@@ -49,6 +49,11 @@ function Sampler(k, dim, f, opts::Options)
 	S = Sampler(k,dim,f,a,chain,ln_p,blobs,accpt,threads,args)
 	@check_used opts
 	return S
+end
+
+function Sampler(k::Integer, dim::Integer, f::Function)
+	opts = @options
+	Sampler(k, dim, f, opts)
 end
 
 # Return lnprobs and blobs at given position
