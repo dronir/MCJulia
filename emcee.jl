@@ -8,6 +8,11 @@
 #   Comm. App. Math. Comp. Sci., Vol. 5 (2010), No. 1, 65–80
 
 require("options.jl")
+
+module MCJulia
+
+export Blob, Sampler, sample, reset
+
 import Base.*
 import OptionsMod.*
 
@@ -121,4 +126,6 @@ function reset(S::Sampler)
 	S.blobs = Array(Blob, (k, 0))
 	S.acceptance_fraction = 0.0
 	return S
+end
+
 end
