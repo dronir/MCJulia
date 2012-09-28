@@ -16,11 +16,7 @@ export Blob, Sampler, sample, reset, log_rosenbrock, flat_chain, save_chain
 import Base.*
 import OptionsMod.*
 
-
 abstract Blob
-
-# Test function (log Rosenbrock banana):
-log_rosenbrock(X::Array{Float64}) = log((1-X[1])^2 + 100*(X[2]-X[1]^2)^2)
 
 # Random generator for the Z distribution of Goodman & Weare, where
 # p(x) = 1/sqrt(x) when 1/a <= x <= a.
@@ -98,9 +94,6 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 	second = halfk+1 : k
 	divisions = [(first, second), (second, first)]
 
-	# FIXME
-	#i0 = S.iteration
-#	i0 = 0
 	for i = i0+1 : i0+N
 		for ensembles in divisions
 			active, passive = ensembles
