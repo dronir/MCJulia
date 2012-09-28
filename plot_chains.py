@@ -64,7 +64,6 @@ if dim <= 9 and dim > 1:
     for i in xrange(0, dim-1):
         for j in xrange(0, dim):
             if i < j:
-                print i, j, i*(dim-1) + j
                 plot.subplot(dim-1, dim-1, i*(dim-1) + j)
                 plot.ylabel("Parameter #%d" % (i+1))
                 plot.xlabel("Parameter #%d" % (j+1))
