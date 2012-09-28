@@ -31,18 +31,19 @@ type Sampler
 	chain::Array{Float64, 3}
 	ln_posterior::Array{Float64,2}
 	blobs::Array{Blob, 2}
-	acceptance_fraction::Float64
+	iterations::Int64
+	accepted::Int64
 	threads::Int64
 	args::(Any...)
 end
 
 function Sampler(k::Integer, dim::Integer, f::Function, opts::Options)
-	@defaults opts a=2.0 threads=1 accpt=0.0
+	@defaults opts a=2.0 threads=1 accpt=0 iter=0
 	@defaults opts chain = zeros(Float64, (k, dim, 0))
 	@defaults opts ln_p = zeros(Float64, (k, 0))
 	@defaults opts blobs = Array(Blob, (k, 0))
 	@defaults opts args = ()
-	S = Sampler(k,dim,f,a,chain,ln_p,blobs,accpt,threads,args)
+	S = Sampler(k,dim,f,a,chain,ln_p,blobs,iter,accpt,threads,args)
 	@check_used opts
 	return S
 end
@@ -109,7 +110,9 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 				if log(rand()) <= log_ratio
 					lnprob[k] = new_lnprob
 					p[k,:] = proposal
+					S.accepted += 1
 				end
+				S.iterations += 1
 				if storechain && (i-i0) % thin == 0
 					S.ln_posterior[k, i/thin] = lnprob[k]
 					S.chain[k, :, fld(i,thin)] = vec(p[k,:])
@@ -139,7 +142,8 @@ function reset(S::Sampler)
 	S.chain = zeros(Float64, (k, S.dim, 0))
 	S.ln_posterior = zeros(Float64, (k, 0))
 	S.blobs = Array(Blob, (k, 0))
-	S.acceptance_fraction = 0.0
+	S.accepted = 0
+	S.iterations = 0
 	return S
 end
 
