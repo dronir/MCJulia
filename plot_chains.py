@@ -10,20 +10,25 @@ from sys import argv, exit
 from os.path import exists
 
 if len(argv) < 2:
-    print "Error, no filename given."
+    print "Error: no filename given."
     print "Usage:   %s <filename>" % (argv[0])
     exit()
 if len(argv) > 2:
-    print "Warning, too many filenames."
+    print "Warning: too many filenames."
     print "The following were ignored:  %s" % " ".join(argv[2:])
 
 filename = argv[1]
 
 if not exists(filename):
-    print "Error, file not found: %s" % filename
+    print "Error: file not found: %s" % filename
     exit()
 
-chain = loadtxt(filename, delimiter=",")
+try:
+    chain = loadtxt(filename, delimiter=",")
+except ValueError:
+    print "Error: could not read file %s." % filename
+    exit()
+
 s = chain.shape
 if len(s) > 1:
     steps = s[1]
