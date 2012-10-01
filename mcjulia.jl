@@ -112,7 +112,7 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 				end
 				S.iterations += 1
 				if storechain && (i-i0) % thin == 0
-					S.ln_posterior[k, i/thin] = lnprob[k]
+					S.ln_posterior[k, fld(i,thin)] = lnprob[k]
 					S.chain[k, :, fld(i,thin)] = vec(p[k,:])
 				end
 			end
