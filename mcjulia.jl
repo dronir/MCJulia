@@ -7,14 +7,14 @@
 # Goodman & Weare, Ensemble Samplers With Affine Invariance
 #   Comm. App. Math. Comp. Sci., Vol. 5 (2010), No. 1, 65–80
 
-require("options.jl")
+load("options.jl")
 
+# Start module
 module MCJulia
-
-export Blob, Sampler, sample, reset, log_rosenbrock, flat_chain, save_chain
 
 import Base.*
 import OptionsMod.*
+export Blob, Sampler, sample, reset, flat_chain, save_chain
 
 abstract Blob
 
@@ -33,33 +33,33 @@ type Sampler
 	blobs::Array{Blob, 2}
 	iterations::Int64
 	accepted::Int64
-	threads::Int64
 	args::(Any...)
 end
 
+# Constructor with options
 function Sampler(k::Integer, dim::Integer, f::Function, opts::Options)
-	@defaults opts a=2.0 threads=1 accpt=0 iter=0
+	@defaults opts a=2.0 accpt=0 iter=0
 	@defaults opts chain = zeros(Float64, (k, dim, 0))
 	@defaults opts ln_p = zeros(Float64, (k, 0))
 	@defaults opts blobs = Array(Blob, (k, 0))
 	@defaults opts args = ()
-	S = Sampler(k,dim,f,a,chain,ln_p,blobs,iter,accpt,threads,args)
+	S = Sampler(k,dim,f,a,chain,ln_p,blobs,iter,accpt,args)
 	@check_used opts
 	return S
 end
 
-function Sampler(k::Integer, dim::Integer, f::Function)
-	opts = @options
-	Sampler(k, dim, f, opts)
-end
+# Minimal constructor
+Sampler(k::Integer, dim::Integer, f::Function) = Sampler(k, dim, f, @options)
+
+call_lnprob(S::Sampler, pos::Array{Float64}) = S.probfn(pos, S.args...)
 
 # Return lnprobs and blobs at given position
-function get_lnprob(S::Sampler, pos::Array{Float64,2})
+function get_lnprob(S::Sampler, pos::Array{Float64})
 	lnprob = zeros(Float64, S.n_walkers)
 #	blobs = Array(Blob, S.n_walkers)
 #	b = false
 	for k = 1:S.n_walkers
-		p = S.probfn(vec(pos[k,:]))
+		p = call_lnprob(S, vec(pos[k,:]))
 		if length(p) == 1
 			lnprob[k] = p
 		elseif length(p) == 2
@@ -73,8 +73,6 @@ function get_lnprob(S::Sampler, pos::Array{Float64,2})
 	# FIXME
 	return lnprob, None
 end
-
-
 
 function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storechain::Bool)
 	k = S.n_walkers
@@ -105,7 +103,7 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 				X_passive = p[choice,:]
 				z = randZ(S.a)
 				proposal = X_passive + z * (X_active - X_passive)
-				new_lnprob = S.probfn(proposal)
+				new_lnprob = call_lnprob(S, proposal)
 				log_ratio = (S.dim - 1) * log(z) + new_lnprob - lnprob[k]
 				if log(rand()) <= log_ratio
 					lnprob[k] = new_lnprob
