@@ -7,13 +7,10 @@
 # Goodman & Weare, Ensemble Samplers With Affine Invariance
 #   Comm. App. Math. Comp. Sci., Vol. 5 (2010), No. 1, 65–80
 
-load("options.jl")
-
 # Start module
 module MCJulia
 
 import Base.*
-import OptionsMod.*
 export Blob, Sampler, sample, reset, flat_chain, save_chain
 
 abstract Blob
@@ -36,20 +33,21 @@ type Sampler
 	args::(Any...)
 end
 
-# Constructor with options
-function Sampler(k::Integer, dim::Integer, f::Function, opts::Options)
-	@defaults opts a=2.0 accpt=0 iter=0
-	@defaults opts chain = zeros(Float64, (k, dim, 0))
-	@defaults opts ln_p = zeros(Float64, (k, 0))
-	@defaults opts blobs = Array(Blob, (k, 0))
-	@defaults opts args = ()
+# Constructor
+function Sampler(k::Integer, dim::Integer, f::Function, a::Float64, args::(Any...))
+	accpt=0
+	iter=0
+	chain = zeros(Float64, (k, dim, 0))
+	ln_p = zeros(Float64, (k, 0))
+	blobs = Array(Blob, (k, 0))
 	S = Sampler(k,dim,f,a,chain,ln_p,blobs,iter,accpt,args)
-	@check_used opts
 	return S
 end
 
-# Minimal constructor
-Sampler(k::Integer, dim::Integer, f::Function) = Sampler(k, dim, f, @options)
+# Minimal constructors
+Sampler(k::Integer, dim::Integer, f::Function, a::Float64) = Sampler(k, dim, f, a, ())
+Sampler(k::Integer, dim::Integer, f::Function, args::(Any...)) = Sampler(k, dim, f, 2.0, args)
+Sampler(k::Integer, dim::Integer, f::Function) = Sampler(k, dim, f, 2.0, ())
 
 call_lnprob(S::Sampler, pos::Array{Float64}) = S.probfn(pos, S.args...)
 
