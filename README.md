@@ -6,13 +6,12 @@ The algorithm is very efficient at sampling probability distributions which are 
 
 # Usage
 
-See the `test.jl` file for a simple example with detailed comments.
-
-## Sampler
 
 The algorithm is implemented through the `Sampler` type. It keeps track of the sampled function and some optional parameters, and stores the chain of samples and other sampling output.
 
-### Constructors
+See the `test.jl` file for a simple example with detailed comments.
+
+## Constructors
 
 #### Sampler(k, dim, f)
 This is the minimal constructor for a new Sampler object. The parameter `k` gives the number of walkers in the ensemble, `dim` gives the dimension of the sampling space and `f` is the log-probability function. The number of walkers must be even and greater than twice the dimension.
@@ -41,7 +40,7 @@ S = Sampler(50, 2, log_probability, args)
 ```
 
 
-### Functions
+## Functions
 
 #### p = sample(S, p0, N, thin, storechain)
 #### p = sample(S, p0, N, storechain)
@@ -70,7 +69,7 @@ Return the `S.chain` array flatted along the walker dimension.
 Save the flattened chain into a plaintext file in CSV format.
 
 
-### Fields
+## Fields
 
 These are the fields defined for the `Sampler` type. The values of some of them will be of interest to the user. The user should not need to change the values of any fields manually.
 
@@ -106,8 +105,8 @@ An integer giving the number of accepted moves since the last reset (or creation
 
 
 # Future work
-## Parallelization
+### Parallelization
 This is definitely planned as the next major improvement.
 
-## Blobs
+### Blobs
 The Python package `emcee` allows the log-probability function to return arbitrary metadata "Blobs" which are also saved for each step in the chain. This may be a useful feature and will be implemented after parallelization.
