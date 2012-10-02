@@ -11,9 +11,8 @@
 module MCJulia
 
 import Base.*
-export Blob, Sampler, sample, reset, flat_chain, save_chain
+export Sampler, sample, reset, flat_chain, save_chain
 
-abstract Blob
 
 # Random generator for the Z distribution of Goodman & Weare, where
 # p(x) = 1/sqrt(x) when 1/a <= x <= a.
@@ -27,7 +26,6 @@ type Sampler
 	a::Float64
 	chain::Array{Float64, 3}
 	ln_posterior::Array{Float64,2}
-	blobs::Array{Blob, 2}
 	iterations::Int64
 	accepted::Int64
 	args::(Any...)
@@ -39,8 +37,7 @@ function Sampler(k::Integer, dim::Integer, f::Function, a::Real, args::(Any...))
 	iter=0
 	chain = zeros(Float64, (k, dim, 0))
 	ln_p = zeros(Float64, (k, 0))
-	blobs = Array(Blob, (k, 0))
-	S = Sampler(k,dim,f,a,chain,ln_p,blobs,iter,accpt,args)
+	S = Sampler(k,dim,f,a,chain,ln_p,iter,accpt,args)
 	return S
 end
 
@@ -51,25 +48,13 @@ Sampler(k::Integer, dim::Integer, f::Function) = Sampler(k, dim, f, 2.0, ())
 
 call_lnprob(S::Sampler, pos::Array{Float64}) = S.probfn(pos, S.args...)
 
-# Return lnprobs and blobs at given position
+# Return all lnprobs at given position
 function get_lnprob(S::Sampler, pos::Array{Float64})
 	lnprob = zeros(Float64, S.n_walkers)
-#	blobs = Array(Blob, S.n_walkers)
-#	b = false
 	for k = 1:S.n_walkers
-		p = call_lnprob(S, vec(pos[k,:]))
-		if length(p) == 1
-			lnprob[k] = p
-		elseif length(p) == 2
-			b = true
-			lnprob[k] = p[1]
-			blobs[k] = p[2]
-		else
-			error("Something weird came out of S.lnprobf()")
-		end
+		lnprob[k] = call_lnprob(S, vec(pos[k,:]))
 	end
-	# FIXME
-	return lnprob, None
+	return lnprob
 end
 
 function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storechain::Bool)
@@ -77,7 +62,7 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 	halfk = fld(k, 2)
 
 	p = copy(p0)
-	lnprob, blobs = get_lnprob(S, p)
+	lnprob = get_lnprob(S, p)
 
 	i0 = size(S.chain, 3)
 
@@ -99,8 +84,7 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 				X_active = p[k,:]
 				choice = passive[randi(l_pas)]
 				X_passive = p[choice,:]
-				z = randZ(S.a)
-				proposal = X_passive + z * (X_active - X_passive)
+				proposal = X_passive + randZ(S.a) * (X_active - X_passive)
 				new_lnprob = call_lnprob(S, proposal)
 				log_ratio = (S.dim - 1) * log(z) + new_lnprob - lnprob[k]
 				if log(rand()) <= log_ratio
@@ -137,7 +121,6 @@ function reset(S::Sampler)
 	k = S.n_walkers
 	S.chain = zeros(Float64, (k, S.dim, 0))
 	S.ln_posterior = zeros(Float64, (k, 0))
-	S.blobs = Array(Blob, (k, 0))
 	S.accepted = 0
 	S.iterations = 0
 	return S
