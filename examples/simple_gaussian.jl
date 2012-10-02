@@ -34,4 +34,4 @@ save_chain(S, "chain.txt")
 
 # Uncomment the following to automatically run the simple Python
 # plotting program:
- run(`python plot_chains.py chain.txt`)
+# run(`python plot_chains.py chain.txt`)
