@@ -9,7 +9,7 @@ The algorithm is very efficient at sampling probability distributions which are 
 
 The algorithm is implemented through the `Sampler` type. It keeps track of the sampled function and some optional parameters, and stores the chain of samples and other sampling output.
 
-See the `test.jl` file for a simple example with detailed comments.
+See the `examples` directory for some example programs.
 
 ## Constructors
 
