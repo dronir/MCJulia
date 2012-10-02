@@ -58,7 +58,7 @@ The return value `p` is an `Array{Float64, 2}` giving the positions of the walke
 
 #### reset(S)
 
-Reset a `Sampler` object to the state it was in right after construction. This will set `S.iterations` and `S.accepted` to zero and also empty the `S.chain`, `S.ln_posterior` and `S.blobs` arrays.
+Reset a `Sampler` object to the state it was in right after construction. This will set `S.iterations` and `S.accepted` to zero and also empty the `S.chain` and `S.ln_posterior`.
 
 #### flat_chain(S)
 
