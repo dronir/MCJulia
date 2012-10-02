@@ -54,9 +54,9 @@ for i in xrange(dim):
     plot.figure(i+1)
     plot.title("Histogram for parameter #%d" % (i+1))
     if dim > 1:
-        plot.hist(chain[i,:], 20, color="black")
+        plot.hist(chain[i,:], 30, color="black")
     else:
-        plot.hist(chain[:], 20, color="black")
+        plot.hist(chain[:], 30, color="black")
 
 # Make correlation plot
 if dim <= 9 and dim > 1:
