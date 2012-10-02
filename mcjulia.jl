@@ -34,7 +34,7 @@ type Sampler
 end
 
 # Constructor
-function Sampler(k::Integer, dim::Integer, f::Function, a::Float64, args::(Any...))
+function Sampler(k::Integer, dim::Integer, f::Function, a::Real, args::(Any...))
 	accpt=0
 	iter=0
 	chain = zeros(Float64, (k, dim, 0))
@@ -45,7 +45,7 @@ function Sampler(k::Integer, dim::Integer, f::Function, a::Float64, args::(Any..
 end
 
 # Minimal constructors
-Sampler(k::Integer, dim::Integer, f::Function, a::Float64) = Sampler(k, dim, f, a, ())
+Sampler(k::Integer, dim::Integer, f::Function, a::Real) = Sampler(k, dim, f, a, ())
 Sampler(k::Integer, dim::Integer, f::Function, args::(Any...)) = Sampler(k, dim, f, 2.0, args)
 Sampler(k::Integer, dim::Integer, f::Function) = Sampler(k, dim, f, 2.0, ())
 
