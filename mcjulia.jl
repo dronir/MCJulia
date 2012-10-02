@@ -84,7 +84,8 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 				X_active = p[k,:]
 				choice = passive[randi(l_pas)]
 				X_passive = p[choice,:]
-				proposal = X_passive + randZ(S.a) * (X_active - X_passive)
+				z = randZ(S.a)
+				proposal = X_passive + z*(X_active - X_passive)
 				new_lnprob = call_lnprob(S, proposal)
 				log_ratio = (S.dim - 1) * log(z) + new_lnprob - lnprob[k]
 				if log(rand()) <= log_ratio
