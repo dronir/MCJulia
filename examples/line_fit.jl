@@ -4,9 +4,9 @@
 # First generate the data. We will make a data set consisting of (x,y)
 # pairs of the form y = a*x + b + noise.
 # These are the parameters used to generate the data:
-a = 5.2
-b = -7.75
-sigma = 0.1 # noise sigma
+a = 2.0
+b = -4.0
+sigma = 0.5 # noise sigma
 
 # Generate ten data points evenly spaced in x:
 n_data = 10
@@ -21,7 +21,7 @@ import MCJulia.*
 
 # When fitting data, our likelihood function has the form exp(-ChiSq), where
 # ChiSq = sum(model - data)^2 / sigma. We use a wide normal prior distribution
-# for a and b, and a Jeffreys prior p(x) ~= 1/x for sigma.
+# for a and b, and an exponential prior p(x) ~= exp(-x) for sigma.
 # Our log-probability function has two extra arguments after the parameter vector,
 # giving the x and y values of the data points.
 function log_probability(parameters::Array{Float64}, X_data::Array{Float64}, Y_data::Array{Float64})
@@ -33,7 +33,7 @@ function log_probability(parameters::Array{Float64}, X_data::Array{Float64}, Y_d
 	end
 	Y_model = a*X_data + b
 	ChiSq = sum(((Y_model - Y_data)/sigma).^2)
-	return sigma <= 0 ? -Inf : -ChiSq - (a/100)^2 - (b/100)^2 - sigma
+	return -ChiSq - (a/100.0)^2 - (b/100.0)^2 - sigma
 end
 
 # We give our data points to the sampler in the extra arguments tuple.
