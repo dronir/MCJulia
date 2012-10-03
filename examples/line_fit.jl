@@ -20,7 +20,7 @@ load("mcjulia.jl")
 import MCJulia.*
 
 # When fitting data, our likelihood function has the form exp(-ChiSq), where
-# ChiSq = sum(model - data)^2 / sigma. We use a wide normal prior distribution
+# ChiSq = sum((model - data)/sigma)^2. We use a wide normal prior distribution
 # for a and b, and an exponential prior p(x) ~= exp(-x) for sigma.
 # Our log-probability function has two extra arguments after the parameter vector,
 # giving the x and y values of the data points.
