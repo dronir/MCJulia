@@ -91,7 +91,7 @@ The constant arguments for the log-probability function. Set by the user through
 #### Sampler.chain
 An `Array{Float64, 3}` with shape `(k, dim, N)`, where `k` is the number of walkers in the ensemble, `dim` is the dimension of the sampling space and `N` is the number of samples taken (see the `sample` function, below). This is what you are mostly interested in acquiring.
 
-#### Sampler.lnprob
+#### Sampler.ln_posterior
 
 An `Array{Flaot64, 2}` with shape `(k, N)`, giving the log-probability value of each walker at each point in the chain.
 
