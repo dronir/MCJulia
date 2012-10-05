@@ -4,7 +4,7 @@
 # Quick python program to plot chains produced by the
 # save_chain() function in MC Julia.
 
-from numpy import loadtxt
+from numpy import loadtxt, log
 from matplotlib import pyplot as plot
 from sys import argv, exit
 from os.path import exists
@@ -41,22 +41,28 @@ plot.figure(0)
 
 # Loop over the chains for each parameter
 for i in xrange(dim):
+    if dim > 1:
+        data = chain[i,:]
+    else:
+        data = chain[:]
+    mean = data.mean()
+    std = data.std()
     # Plot chain
     plot.figure(0)
     sub = dim*100 + 10 + i+1
     plot.subplot(sub)
-    if dim > 1:
-        plot.plot(chain[i,:], color="black")
-    else:
-        plot.plot(chain[:], color="black")
+    plot.plot(data, color="black")
     
     # Plot histogram
     plot.figure(i+1)
-    plot.title("Histogram for parameter #%d" % (i+1))
-    if dim > 1:
-        plot.hist(chain[i,:], 30, color="black")
-    else:
-        plot.hist(chain[:], 30, color="black")
+    counts, bins, patches = plot.hist(data, 30, color="black")
+    mode = bins[counts.argmax()] + (bins[1]-bins[0])/2.0
+    hist_title = u"Parameter #%d: mode = %.2f, mean±std = %.3f ± %.3f"
+    plot.title(hist_title % (i+1, mode, mean, std))
+  #  plot.axvline(mean, color="red")
+ #   plot.axvline(mean+std, linestyle="--", color="red")
+#    plot.axvline(mean-std, linestyle="--", color="red")
+
 
 # Make correlation plot
 if dim <= 9 and dim > 1:
