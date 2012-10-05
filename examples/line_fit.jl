@@ -19,9 +19,9 @@ Y = a*X + b + randn(n_data)*sigma
 load("mcjulia.jl")
 import MCJulia.*
 
-# When fitting data, our likelihood function has the form exp(-ChiSq), where
-# ChiSq = sum((model - data)/sigma)^2. We use a wide normal prior distribution
-# for a and b, and an exponential prior p(x) ~= exp(-x) for sigma.
+# When fitting data, our likelihood function has the form 1/sigma^n * exp(-ChiSq/2), where
+# ChiSq = sum((model - data)/sigma)^2 and n is the number of our data points. 
+# We use a wide normal prior distribution for a and b, and a Jeffreys prior p(x) ~= 1/x for sigma.
 # Our log-probability function has two extra arguments after the parameter vector,
 # giving the x and y values of the data points.
 function log_probability(parameters::Array{Float64}, X_data::Array{Float64}, Y_data::Array{Float64})
@@ -31,9 +31,10 @@ function log_probability(parameters::Array{Float64}, X_data::Array{Float64}, Y_d
 	if sigma <= 0
 		return -Inf
 	end
+	n = length(X_data)
 	Y_model = a*X_data + b
-	ChiSq = sum(((Y_model - Y_data)/sigma).^2)
-	return -ChiSq - (a/100.0)^2 - (b/100.0)^2 - sigma
+	ChiSq = 0.5 * sum(((Y_model - Y_data)/sigma).^2)
+	return -(n+1)*log(sigma) -ChiSq - (a/100.0)^2 - (b/100.0)^2
 end
 
 # We give our data points to the sampler in the extra arguments tuple.
@@ -52,16 +53,17 @@ S = Sampler(walkers, dim, log_probability, args)
 p0 = randn((walkers, 3)) * 10
 p0[:,3] = p0[:,3].^2
 
-# Do a burn-in of 100 steps (10000 samples). Discard the samples
-# but keep the final position of the walkers.
+# Do a burn-in of 200 steps (20000 samples). Discard the samples
+# but keep the final position of the walkers. This is a small
+# problem, so it's fast.
 println("Burn-in...")
-p = sample(S, p0, 100, 1, false)
+p = sample(S, p0, 200, 1, false)
 println("acceptance ratio: $(S.accepted / S.iterations)")
 
-# Start sample for another 100 steps, saving the chain every 10
+# Start sample for another 100 steps, saving the chain every 5
 # steps, starting at the end position of the burn-in.
 println("Sampling...")
-sample(S, p, 100, 10, true)
+sample(S, p, 100, 5, true)
 println("acceptance ratio: $(S.accepted / S.iterations)")
 
 # Save and plot the chain.
