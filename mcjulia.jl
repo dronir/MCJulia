@@ -10,7 +10,7 @@
 # Start module
 module MCJulia
 
-import Base.*
+using Base
 export Sampler, sample, reset, flat_chain, save_chain
 
 

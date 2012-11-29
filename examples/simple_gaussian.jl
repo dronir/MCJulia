@@ -2,7 +2,7 @@
 
 # Load the module and import its public names
 load("mcjulia.jl")
-import MCJulia.*
+using MCJulia
 
 # In this simple test case we'll estimate the one-dimensional
 # probability distribution N(1, 1). We need to give the logarithm
