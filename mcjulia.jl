@@ -10,7 +10,6 @@
 # Start module
 module MCJulia
 
-using Base
 export Sampler, sample, reset, flat_chain, save_chain
 
 
@@ -79,10 +78,10 @@ function sample(S::Sampler, p0::Array{Float64,2}, N::Int64, thin::Int64, storech
 	for i = i0+1 : i0+N
 		for ensembles in divisions
 			active, passive = ensembles
-			l_pas = length(passive)
+			l_pas = size(passive,1)
 			for k in active
 				X_active = p[k,:]
-				choice = passive[randi(l_pas)]
+				choice = passive[rand(1:l_pas)]
 				X_passive = p[choice,:]
 				z = randZ(S.a)
 				proposal = X_passive + z*(X_active - X_passive)
@@ -143,7 +142,7 @@ end
 # Squash the chains and save them in a csv file
 function save_chain(S::Sampler, filename::String)
 	flatchain = flat_chain(S)
-	csvwrite(filename, flatchain)
+	writecsv(filename, flatchain)
 end
 
 

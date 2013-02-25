@@ -16,7 +16,7 @@ Y = a*X + b + randn(n_data)*sigma
 # In a real application, everything above would come from the data.
 # Now start the actual estimation process.
 
-load("mcjulia.jl")
+
 using MCJulia
 
 # When fitting data, our likelihood function has the form 1/sigma^n * exp(-ChiSq/2), where

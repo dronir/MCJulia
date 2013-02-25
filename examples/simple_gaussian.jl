@@ -1,7 +1,6 @@
 # A Simple MC Julia test case with detailed explanation
 
 # Load the module and import its public names
-load("mcjulia.jl")
 using MCJulia
 
 # In this simple test case we'll estimate the one-dimensional
